@@ -24,7 +24,7 @@ class CreateVendas extends Migration
                 'type'       => 'INT',
                 'constraint' => 11,
                 'unsigned'   => true,
-                'null'       => true, // Permite vendas sem um cliente específico, como uma venda no balcão
+                'null'       => true, 
             ],
             'total_venda' => [
                 'type'       => 'DECIMAL',
