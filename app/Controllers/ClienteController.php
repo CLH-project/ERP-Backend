@@ -9,12 +9,10 @@ class ClienteController extends ResourceController
 {
     use ResponseTrait;
     protected $model;
-
     public function __construct()
     {
         $this->model = model('App\Models\ClienteModel');
     }
-
     public function index()
     {
         $clientes = $this->model->findAll();
@@ -29,14 +27,27 @@ class ClienteController extends ResourceController
             return $this->failValidationErrors($this->model->errors());
         }
     }
-    public function show($id = null)
+    public function show($param = null)
     {
-        $cliente = $this->model->find($id);
-        if ($cliente) {
-            return $this->respond($cliente, 200);
-        } else {
-            return $this->failNotFound('Cliente not found');
-        }
+       if (!$param) {
+        return $this->fail('Informe um ID, nome ou CPF para consulta');
+    }
+
+    $cliente = $this->model->find($param);
+    if (!$cliente) {
+        $cliente = $this->model
+            ->groupStart()
+                ->where('cpf', $param)
+                ->orLike('nome', $param) 
+            ->groupEnd()
+            ->first();
+    }
+
+    if ($cliente) {
+        return $this->respond($cliente, 200);
+    }
+    return $this->failNotFound('Cliente não encontrado');
+        
     }
     public function delete($id = null)
     {
