@@ -28,5 +28,26 @@ class ClienteController extends ResourceController
         } else {
             return $this->failValidationErrors($this->model->errors());
         }
-    } 
+    }
+    public function show($id = null)
+    {
+        $cliente = $this->model->find($id);
+        if ($cliente) {
+            return $this->respond($cliente, 200);
+        } else {
+            return $this->failNotFound('Cliente not found');
+        }
+    }
+    public function delete($id = null)
+    {
+       $clienteEncontrado = $this->model->find($id);
+        if (!$clienteEncontrado) {
+            return $this->failNotFound('Cliente not found');
+        }
+        if ($this->model->delete($id)) {
+            return $this->respondDeleted(['message' => 'Cliente deleted successfully']);
+        } else {
+            return $this->failServerError('Failed to delete cliente');
+        }
+    }
 }
