@@ -61,13 +61,5 @@ class ClienteModel extends Model
     protected $beforeFind     = [];
     protected $afterFind      = [];
     protected $beforeDelete   = [];
-    protected $afterDelete    = [];
-
-     protected function formataTelefone(array $data): array
-    {
-        if (isset($data['data']['telefone']) && !empty($data['data']['telefone'])) {
-            $data['data']['telefone'] = preg_replace('/[^0-9]/', '', $data['data']['telefone']);
-        }
-        return $data;
-    }
+    protected $afterDelete    = []; 
 }
