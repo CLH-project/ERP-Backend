@@ -7,6 +7,10 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
+$routes->options('clientes', static function () {
+    return response()->setStatusCode(204);
+});
+
 // Controller de Clientes
 $routes->get('/clientes', 'ClienteController::index',); // URL http://localhost:8000/clientes
 $routes->post('/clientes', 'ClienteController::create'); // URL http://localhost:8000/clientes
