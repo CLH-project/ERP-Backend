@@ -15,8 +15,21 @@ class ClienteController extends ResourceController
     }
     public function index()
     {
-        $clientes = $this->model->findAll();
-        return $this->respond($clientes, 200);
+        $page = $this->request->getVar('page') ?? 1;
+        $clientes = $this->model->select('nome, cpf, telefone')
+            ->paginate(10, 'default', $page);
+
+        $pager = $this->model->pager;
+
+        return $this->respond([
+            'data' => $clientes,
+            'pager' => [
+                'currentPage' => $pager->getCurrentPage(),
+                'totalPages' => $pager->getPageCount(),
+                'perPage' => $pager->getPerPage(),
+                'total' => $pager->getTotal(),
+            ],
+        ], ResponseInterface::HTTP_OK);
     }
 
      public function create(){
@@ -36,6 +49,7 @@ class ClienteController extends ResourceController
     $cliente = $this->model->find($param);
     if (!$cliente) {
         $cliente = $this->model
+            ->select('nome, cpf, telefone')
             ->groupStart()
                 ->where('cpf', $param)
                 ->orLike('nome', $param) 
@@ -61,4 +75,5 @@ class ClienteController extends ResourceController
             return $this->failServerError('Failed to delete cliente');
         }
     }
+    
 }
