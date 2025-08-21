@@ -9,18 +9,16 @@ class ClienteController extends ResourceController
 {
     use ResponseTrait;
     protected $model;
+
     public function __construct()
     {
         $this->model = model('App\Models\ClienteModel');
     }
     public function paginados()
     {
-        $page = $this->request->getVar('page') ?? 1;
-        $clientes = $this->model->select('nome, cpf, telefone')
-            ->paginate(10, 'default', $page);
-
+        $clientes = $this->model->select('nome, cpf, telefone')->paginate(10,'default');
         $pager = $this->model->pager;
-
+        
         return $this->respond([
             'data' => $clientes,
             'pager' => [
