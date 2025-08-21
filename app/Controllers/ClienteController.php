@@ -13,7 +13,7 @@ class ClienteController extends ResourceController
     {
         $this->model = model('App\Models\ClienteModel');
     }
-    public function index()
+    public function paginados()
     {
         $page = $this->request->getVar('page') ?? 1;
         $clientes = $this->model->select('nome, cpf, telefone')
