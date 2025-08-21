@@ -12,9 +12,8 @@ $routes->options('clientes', static function () {
 });
 
 // Controller de Clientes
-$routes->get('/clientes', 'ClienteController::index',); // URL http://localhost:8000/clientes
+$routes->get('/clientes', 'ClienteController::paginados',); // URL http://localhost:8000/clientes
 $routes->post('/clientes', 'ClienteController::create'); // URL http://localhost:8000/clientes
 $routes->get('/clientes/(:num)', 'ClienteController::show/$1'); // URL http://localhost:8000/clientes/1
 $routes->delete('/clientes/(:num)', 'ClienteController::delete/$1'); // URL http://localhost:8000/clientes/1
 $routes->get('/clientes/(:any)', 'ClienteController::show/$1'); // URL http://localhost:8000/clientes/12345678901 (CPF) ou http://localhost/clientes/João (Nome)
-$routes->get('/clientes/paginados', 'ClienteController::paginados'); 
