@@ -16,7 +16,7 @@ class ClienteController extends ResourceController
     }
     public function paginados()
     {
-        $clientes = $this->model->select('nome, cpf, telefone')->paginate(10,'default');
+        $clientes = $this->model->select('id,nome, cpf, telefone')->paginate(10,'default');
         $pager = $this->model->pager;
         
         return $this->respond([
