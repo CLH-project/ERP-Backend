@@ -7,7 +7,9 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-$routes->options('clientes', static function () {
+
+// Rotas para options
+$routes->options('(:any)', static function () {
     return response()->setStatusCode(204);
 });
 
@@ -18,7 +20,5 @@ $routes->get('/clientes/(:num)', 'ClienteController::show/$1'); // URL http://lo
 $routes->delete('/clientes/(:num)', 'ClienteController::delete/$1'); // URL http://localhost:8000/clientes/1
 $routes->get('/clientes/(:any)', 'ClienteController::show/$1'); // URL http://localhost:8000/clientes/12345678901 (CPF) ou http://localhost/clientes/João (Nome)
 
-
 // Rotas Fornecedores
-
 $routes->post('fornecedor' ,'FornecedorController::create');
