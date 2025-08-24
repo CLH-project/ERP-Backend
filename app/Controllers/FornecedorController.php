@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Controllers;
-
 use App\Controllers\BaseController;
 use App\Models\FornecedorModel;
 use App\Models\FornecedorContatoModel;
+use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\RESTful\ResourceController;
 
-class FornecedorController extends BaseController
+class FornecedorController extends ResourceController
 {
     public function create()
     {
@@ -31,8 +32,7 @@ class FornecedorController extends BaseController
         if (!$modelFornecedor->insert($fornecedorData)) {
             $db->transRollback();
             return $this->response->setJSON([
-                'error' => 'Erro ao salvar fornecedor.',
-                'validation_errors' => $modelFornecedor->errors()
+                 $modelFornecedor->errors()
             ]);
         }
 
@@ -41,8 +41,7 @@ class FornecedorController extends BaseController
         if (!$modelContato->insert($contatoData)) {
             $db->transRollback();
             return $this->response->setJSON([
-                'error' => 'Erro ao salvar contato do fornecedor.',
-                'validation_errors' => $modelContato->errors()
+                 $modelContato->errors()
             ]);
         }
 
@@ -55,8 +54,28 @@ class FornecedorController extends BaseController
         }
 
         return $this->response->setJSON([
-            'message' => 'Fornecedor e contato salvos com sucesso!',
-            'fornecedor_id' => $contatoData['fornecedor_id']
+            'message' => 'Fornecedor e contato salvos com sucesso!'
         ]);
+    }
+
+    public function paginate()
+    {
+    $model = new FornecedorModel();
+
+    $fornecedores = $model
+        ->select('fornecedores.id, fornecedores.nome, fornecedores.cnpj, contato_fornecedores.email, contato_fornecedores.telefone')
+        ->join('contato_fornecedores', 'contato_fornecedores.fornecedor_id = fornecedores.id')
+        ->paginate(10, 'default');
+
+    $pager = $model->pager;
+    return $this->respond([
+        'data' => $fornecedores,
+        'pager' => [
+            'currentPage' => $pager->getCurrentPage(),
+            'totalPages' => $pager->getPageCount(),
+            'perPage' => $pager->getPerPage(),
+            'total' => $pager->getTotal(),
+        ],
+    ], ResponseInterface::HTTP_OK);
     }
 }
