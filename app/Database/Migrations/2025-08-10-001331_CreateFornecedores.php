@@ -21,7 +21,7 @@ class CreateFornecedores extends Migration
             ],
             'cnpj' => [
                 'type'       => 'VARCHAR',
-                'constraint' => 14,
+                'constraint' => 18,
             ],
             'created_at' => [
                 'type' => 'DATETIME',

@@ -30,7 +30,7 @@ class FornecedorModel extends Model
     // Validation
     protected $validationRules      = [
          'nome' => 'required|min_length[3]|max_length[100]',
-         'cnpj' => 'required|exact_length[14]|is_unique[fornecedores.cnpj]'
+         'cnpj' => 'required|exact_length[18]|is_unique[fornecedores.cnpj]'
     ];
     protected $validationMessages   = [
         'nome' => [
@@ -40,7 +40,7 @@ class FornecedorModel extends Model
         ],
         'cnpj' => [
             'required'     => 'O campo CNPJ é obrigatório.',
-            'exact_length' => 'O CNPJ deve ter exatamente 14 dígitos (somente números).',
+            'exact_length' => 'O CNPJ deve ter exatamente 18 dígitos (somente números).',
             'is_unique'    => 'Esse CNPJ já está cadastrado.'
         ]
     ];
