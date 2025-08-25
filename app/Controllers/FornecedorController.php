@@ -31,16 +31,15 @@ class FornecedorController extends ResourceController
 
         if (!$modelFornecedor->insert($fornecedorData)) {
             $db->transRollback();
-            return $this->response->setJSON([
-                 $modelFornecedor->errors()
-            ]);
+            return $this->response->setStatusCode(400)->setJSON([
+                 $modelFornecedor->errors()]);
         }
 
         $contatoData['fornecedor_id'] = $modelFornecedor->getInsertID();
 
         if (!$modelContato->insert($contatoData)) {
             $db->transRollback();
-            return $this->response->setJSON([
+            return $this->response->setStatusCode(400)->setJSON([
                  $modelContato->errors()
             ]);
         }
@@ -48,12 +47,12 @@ class FornecedorController extends ResourceController
         $db->transComplete();
 
         if ($db->transStatus() === false) {
-            return $this->response->setJSON([
+            return $this->response->setStatusCode(500)->setJSON([
                 'error' => 'Erro na transação. Nenhum dado foi salvo.'
             ]);
         }
 
-        return $this->response->setJSON([
+        return $this->response->setStatusCode(200)->setJSON([
             'message' => 'Fornecedor e contato salvos com sucesso!'
         ]);
     }
