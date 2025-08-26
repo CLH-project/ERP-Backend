@@ -77,4 +77,45 @@ class FornecedorController extends ResourceController
         ],
     ], ResponseInterface::HTTP_OK);
     }
+    public function filter()
+    {
+    $nome = $this->request->getGet('nome');
+    $cnpj = $this->request->getGet('cnpj');
+
+    $model = new FornecedorModel();
+
+    $builder = $model
+        ->select('fornecedores.id, fornecedores.nome, fornecedores.cnpj, contato_fornecedores.email, contato_fornecedores.telefone')
+        ->join('contato_fornecedores', 'contato_fornecedores.fornecedor_id = fornecedores.id');
+
+    if ($nome) {
+        $builder->like('fornecedores.nome', $nome);
+    }
+
+    if ($cnpj) {
+        $builder->like('fornecedores.cnpj', $cnpj);
+    }
+
+    $fornecedores = $builder->findAll();
+
+    return $this->respond([
+        'data' => $fornecedores
+    ], ResponseInterface::HTTP_OK);
+}
+
+    public function delete($id = null)
+    {
+    $model = new FornecedorModel();
+
+    if (!$id || !$model->find($id)) {
+        return $this->failNotFound("Fornecedor não encontrado");
+    }
+
+    $model->delete($id);
+
+    return $this->respondDeleted([
+        'message' => 'Fornecedor deletado com sucesso'
+    ]);
+    }
+
 }

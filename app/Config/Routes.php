@@ -22,3 +22,5 @@ $routes->get('/clientes/(:any)', 'ClienteController::show/$1'); // URL http://lo
 // Rotas Fornecedores
 $routes->post('fornecedor' ,'FornecedorController::create');
 $routes->get('fornecedor','FornecedorController::paginate');
+$routes->get('fornecedor/filter', 'FornecedorController::filter');
+$routes->delete('fornecedor/(:num)', 'FornecedorController::delete/$1');
