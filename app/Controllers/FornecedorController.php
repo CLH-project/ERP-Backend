@@ -117,5 +117,4 @@ class FornecedorController extends ResourceController
         'message' => 'Fornecedor deletado com sucesso'
     ]);
     }
-
 }
