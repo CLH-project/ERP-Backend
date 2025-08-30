@@ -24,3 +24,7 @@ $routes->post('fornecedor' ,'FornecedorController::create');
 $routes->get('fornecedor','FornecedorController::paginate');
 $routes->get('fornecedor/filter', 'FornecedorController::filter');
 $routes->delete('fornecedor/(:num)', 'FornecedorController::delete/$1');
+
+// Rotas Produtos
+$routes->post('produtos','ProdutoController::create');
+$routes->get('produtos','ProdutoController::paginate');

@@ -12,7 +12,7 @@ class ProdutoModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nome','marca','valor_unico','estoque','categoria'];
+    protected $allowedFields    = ['nome','marca','valor_unico','estoque','categoria','fornecedor_id'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -36,7 +36,8 @@ class ProdutoModel extends Model
         'marca'=> 'required',
         'valor_unico' => 'required|decimal',
         'estoque'=>'required|integer',
-        'categorias'=>'required'
+        'categoria'=>'required|in_list[Alcolico,Não Alcolico]',
+        'fornecedor_id'=>'required|integer|is_not_unique[fornecedores.id]'
     ];
     protected $validationMessages   = [
         'nome' => [
@@ -54,10 +55,15 @@ class ProdutoModel extends Model
         'required'     => 'Informe a quantidade em estoque.',
         'integer'      => 'O estoque deve ser um número inteiro.'
     ],
-    'categorias' => [
-        'required'     => 'Selecione uma categoria para o produto.'
+    'categoria' => [
+        'required'     => 'Selecione uma categoria para o produto.',
+        'in_list'      => 'Categoria inválida. Use "Alcolico" ou "Não Alcolico".'
+    ],
+    'fornecedor_id' => [
+    'required' => 'O campo fornecedor é obrigatório.',
+    'integer' => 'O ID do fornecedor deve ser um número inteiro.',
+    'is_not_unique' => 'O fornecedor informado não existe.'
     ]
-
     ];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
