@@ -66,5 +66,49 @@ class ProdutoController extends BaseController
         ]
     ]);
     }
+    public function update($id = null){
+        $model = new ProdutoModel();
+        $fornecedorModel = new FornecedorModel();
 
+        if (!$id) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'ID do produto não informado.'
+        ])->setStatusCode(400);
+        }
+
+        $produto = $model->find($id);
+
+        if(!$produto){
+             return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'ID do produto não informado.'
+        ])->setStatusCode(400);
+        }
+
+        $data = $this->request->getJSON(true);
+
+        if (isset($data['fornecedor_id'])) {
+        $fornecedor = $fornecedorModel->find($data['fornecedor_id']);
+        if (!$fornecedor) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Fornecedor não encontrado com o ID informado.'
+            ])->setStatusCode(400);
+        }
+    }
+
+    if ($model->update($id, $data)) {
+        return $this->response->setJSON([
+            'status' => 'sucesso',
+            'message' => 'Produto atualizado com sucesso!'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Erro ao atualizar produto.',
+            'errors' => $model->errors()
+        ])->setStatusCode(400);
+    }
+    }
 }
