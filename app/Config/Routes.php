@@ -28,3 +28,4 @@ $routes->delete('fornecedor/(:num)', 'FornecedorController::delete/$1');
 // Rotas Produtos
 $routes->post('produtos','ProdutoController::create');
 $routes->get('produtos','ProdutoController::paginate');
+$routes->put('produtos/(:num)','ProdutoController::update/$1');

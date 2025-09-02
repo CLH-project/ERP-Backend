@@ -32,7 +32,7 @@ class ProdutoModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'nome'=> 'required|min_length[3]',
+        'nome'=> 'required|min_length[3]|is_unique[produtos.nome]',
         'marca'=> 'required',
         'valor_unico' => 'required|decimal',
         'estoque'=>'required|integer',
@@ -42,7 +42,8 @@ class ProdutoModel extends Model
     protected $validationMessages   = [
         'nome' => [
         'required'     => 'O campo Nome é obrigatório.',
-        'min_length'   => 'O Nome deve ter pelo menos 3 caracteres.'
+        'min_length'   => 'O Nome deve ter pelo menos 3 caracteres.',
+        'is_unique'    => 'Esse produto já consta em nosso sistema.'
     ],
     'marca' => [
         'required'     => 'Informe a marca do produto.'
