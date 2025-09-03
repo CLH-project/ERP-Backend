@@ -111,4 +111,34 @@ class ProdutoController extends BaseController
         ])->setStatusCode(400);
     }
     }
+
+    public function delete($id = null){
+        $model = new ProdutoModel();
+
+        if (!$id) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'ID do produto não informado.'
+        ])->setStatusCode(400);
+    }
+    $produto = $model->find($id);
+
+    if(!$produto){
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Produto não encontrado.'
+        ])->setStatusCode(404);
+    }
+    if($model->delete($id)){
+        return $this->response->setJSON([
+            'status' => 'sucesso',
+            'message' =>'Produto excluído com sucesso!'
+        ]);
+    }else{
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Erro ao excluir produto.'
+        ])->setStatusCode(500);
+    }
+}
 }
