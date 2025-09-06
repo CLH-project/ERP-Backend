@@ -6,10 +6,19 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class UsuarioController extends BaseController
 {
+    protected $usuarioModel;
+
+    public function initController(
+        \CodeIgniter\HTTP\RequestInterface $request,
+        \CodeIgniter\HTTP\ResponseInterface $response,
+        \Psr\Log\LoggerInterface $logger
+    ) {
+        parent::initController($request, $response, $logger);
+        $this->usuarioModel = new UsuarioModel();
+    }
+
     public function create()
     {
-        $model = new UsuarioModel();
-
         $data = $this->request->getJSON(true);
 
         if (!$data) {
@@ -19,79 +28,79 @@ class UsuarioController extends BaseController
             ])->setStatusCode(400);
         }
 
-        if ($model->insert($data)) {
-            return $this->response->setJSON([
-                'status' => 'sucesso',
-                'message' => 'Usuário cadastrado com sucesso!'
-            ])->setStatusCode(201);
-        } else {
+        if (! $this->usuarioModel->insert($data)) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Erro ao cadastrar usuário.',
-                'errors' => $model->errors()
+                'errors' => $this->usuarioModel->errors()
             ])->setStatusCode(400);
         }
+
+        return $this->response->setJSON([
+            'status' => 'sucesso',
+            'message' => 'Usuário cadastrado com sucesso!'
+        ])->setStatusCode(201);
     }
 
-    public function update ($id = null){
-        $model = new UsuarioModel();
-
-        if(!$id){
+    public function update($id = null)
+    {
+        if (!$id) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message'=> 'ID do usuário não informado.'
+                'message' => 'ID do usuário não informado.'
             ])->setStatusCode(400);
         }
 
-        $usuario = $model->find($id);
+        $usuario = $this->usuarioModel->find($id);
         if (!$usuario) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Usuário não encontrado.'
-        ])->setStatusCode(404);
-    }
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Usuário não encontrado.'
+            ])->setStatusCode(404);
+        }
+
         $json = $this->request->getJSON(true);
-        $data = array_filter($json,function ($key){
-            return in_array($key,['nome','cargo','senha']);
-        },ARRAY_FILTER_USE_KEY);
+        $data = array_filter($json, function ($key) {
+            return in_array($key, ['nome', 'cargo', 'senha']);
+        }, ARRAY_FILTER_USE_KEY);
 
         if (!$data) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Dados não enviados ou inválidos.'
-        ])->setStatusCode(400);
-    }
-    if ($model->update($id, $data)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Dados não enviados ou inválidos.'
+            ])->setStatusCode(400);
+        }
+
+        if (! $this->usuarioModel->update($id, $data)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Erro ao atualizar usuário.',
+                'errors' => $this->usuarioModel->errors()
+            ])->setStatusCode(400);
+        }
+
         return $this->response->setJSON([
             'status' => 'sucesso',
             'message' => 'Usuário atualizado com sucesso!'
         ]);
-    } else {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Erro ao atualizar usuário.',
-            'errors' => $model->errors()
-        ])->setStatusCode(400);
     }
-}
+
     public function paginate()
     {
-        $model = new UsuarioModel();
-
         $page = $this->request->getGet('page') ?? 1;
         $perPage = 10;
 
-        $usuarios = $model->paginate($perPage, 'default', $page);
-        $pager = $model->pager;
+        $usuarios = $this->usuarioModel->paginate($perPage, 'default', $page);
+        $pager = $this->usuarioModel->pager;
 
         $usuariosFiltrados = array_map(function ($usuario) {
-        return [
-            'id' => $usuario['id'],
-            'nome' => $usuario['nome'],
-            'cpf' => $usuario['cpf'],
-            'cargo' => $usuario['cargo']
-        ];
-    }, $usuarios);
+            return [
+                'id' => $usuario['id'],
+                'nome' => $usuario['nome'],
+                'cpf' => $usuario['cpf'],
+                'cargo' => $usuario['cargo']
+            ];
+        }, $usuarios);
 
         return $this->response->setJSON([
             'status' => 'sucesso',
@@ -104,36 +113,34 @@ class UsuarioController extends BaseController
             ]
         ]);
     }
+
     public function delete($id = null)
-{
-    if ($id === null) {
-        return $this->response->setJSON([
-            'status' => 'erro',
-            'mensagem' => 'ID do usuário não fornecido.'
-        ])->setStatusCode(400);
-    }
+    {
+        if ($id === null) {
+            return $this->response->setJSON([
+                'status' => 'erro',
+                'mensagem' => 'ID do usuário não fornecido.'
+            ])->setStatusCode(400);
+        }
 
-    $model = new UsuarioModel();
+        $usuario = $this->usuarioModel->find($id);
+        if (!$usuario) {
+            return $this->response->setJSON([
+                'status' => 'erro',
+                'mensagem' => 'Usuário não encontrado.'
+            ])->setStatusCode(404);
+        }
 
-    $usuario = $model->find($id);
+        if (! $this->usuarioModel->delete($id)) {
+            return $this->response->setJSON([
+                'status' => 'erro',
+                'mensagem' => 'Erro ao deletar o usuário.'
+            ])->setStatusCode(500);
+        }
 
-    if (!$usuario) {
-        return $this->response->setJSON([
-            'status' => 'erro',
-            'mensagem' => 'Usuário não encontrado.'
-        ])->setStatusCode(404);
-    }
-
-    if ($model->delete($id)) {
         return $this->response->setJSON([
             'status' => 'sucesso',
             'mensagem' => 'Usuário deletado com sucesso.'
         ]);
-    } else {
-        return $this->response->setJSON([
-            'status' => 'erro',
-            'mensagem' => 'Erro ao deletar o usuário.'
-        ])->setStatusCode(500);
     }
-}
 }
