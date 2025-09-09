@@ -58,7 +58,7 @@ class ProdutoController extends BaseController
         $page = $this->request->getGet('page') ?? 1;
         $perPage = 10;
 
-        $produtos = $this->produtoModel->select('produtos.id, produtos.nome, produtos.valor_unico, fornecedores.nome as fornecedor')
+        $produtos = $this->produtoModel->select('produtos.id, produtos.nome, produtos.valor_unico,produtos.marca,produtos.estoque,produtos.categoria,fornecedores.nome as fornecedor')
             ->join('fornecedores', 'fornecedores.id = produtos.fornecedor_id')
             ->paginate($perPage, 'default', $page);
         $pager = $this->produtoModel->pager;
