@@ -2,7 +2,6 @@
 namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\UsuarioModel;
-use CodeIgniter\HTTP\ResponseInterface;
 
 class UsuarioController extends BaseController
 {
@@ -119,7 +118,7 @@ class UsuarioController extends BaseController
         if ($id === null) {
             return $this->response->setJSON([
                 'status' => 'erro',
-                'mensagem' => 'ID do usuário não fornecido.'
+                'mensage' => 'ID do usuário não fornecido.'
             ])->setStatusCode(400);
         }
 
@@ -134,13 +133,13 @@ class UsuarioController extends BaseController
         if (! $this->usuarioModel->delete($id)) {
             return $this->response->setJSON([
                 'status' => 'erro',
-                'mensagem' => 'Erro ao deletar o usuário.'
+                'mensage' => 'Erro ao deletar o usuário.'
             ])->setStatusCode(500);
         }
 
         return $this->response->setJSON([
             'status' => 'sucesso',
-            'mensagem' => 'Usuário deletado com sucesso.'
+            'mensage' => 'Usuário deletado com sucesso.'
         ]);
     }
 }
