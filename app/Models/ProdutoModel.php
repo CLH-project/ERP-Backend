@@ -43,7 +43,6 @@ class ProdutoModel extends Model
         'nome' => [
         'required'     => 'O campo Nome é obrigatório.',
         'min_length'   => 'O Nome deve ter pelo menos 3 caracteres.',
-        'is_unique'    => 'Esse produto já consta em nosso sistema.'
     ],
     'marca' => [
         'required'     => 'Informe a marca do produto.'

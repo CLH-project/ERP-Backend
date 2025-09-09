@@ -104,6 +104,7 @@ class ProdutoController extends BaseController
                 ])->setStatusCode(400);
             }
         }
+        $this->produtoModel->setValidationRule('nome', "required|min_length[3]|is_unique[produtos.nome,id,{$id}]");
 
         if ($this->produtoModel->update($id, $data)) {
             return $this->response->setJSON([
