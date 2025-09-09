@@ -1,6 +1,7 @@
 <?php
 namespace App\Controllers;
 use App\Controllers\BaseController;
+use App\Models\ClienteModel;
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -8,17 +9,28 @@ use CodeIgniter\RESTful\ResourceController;
 class ClienteController extends ResourceController
 {
     use ResponseTrait;
-    protected $model;
+    protected $clienteModel;
 
-    public function __construct()
-    {
-        $this->model = model('App\Models\ClienteModel');
+    public function initController(
+        \CodeIgniter\HTTP\RequestInterface $request,
+        \CodeIgniter\HTTP\ResponseInterface $response,
+        \Psr\Log\LoggerInterface $logger
+    ) {
+        parent::initController($request, $response, $logger);
+        $this->clienteModel = new ClienteModel();
     }
+
     public function paginados()
     {
-        $clientes = $this->model->select('id,nome, cpf, telefone')->paginate(10,'default');
-        $pager = $this->model->pager;
-        
+        $page = $this->request->getGet('page') ?? 1;
+        $perPage = 10;
+
+        $clientes = $this->clienteModel
+            ->select('id, nome, cpf, telefone')
+            ->paginate($perPage, 'default', $page);
+
+        $pager = $this->clienteModel->pager;
+
         return $this->respond([
             'data' => $clientes,
             'pager' => [
@@ -30,48 +42,62 @@ class ClienteController extends ResourceController
         ], ResponseInterface::HTTP_OK);
     }
 
-     public function create(){
+    public function create()
+    {
         $data = $this->request->getJSON(true);
-        if ($this->model->save($data)) {
+
+        if (!$data) {
+            return $this->failValidationErrors(['message' => 'Dados não enviados ou inválidos.']);
+        }
+
+        if ($this->clienteModel->save($data)) {
             return $this->respondCreated(['message' => 'Cadastro realizado com sucesso']);
         } else {
-            return $this->failValidationErrors($this->model->errors());
+            return $this->failValidationErrors($this->clienteModel->errors());
         }
     }
+
     public function show($param = null)
     {
-       if (!$param) {
-        return $this->fail('Informe um ID, nome ou CPF para consulta');
+        if (!$param) {
+            return $this->fail('Informe um ID, nome ou CPF para consulta');
+        }
+
+        $cliente = $this->clienteModel->find($param);
+
+        if (!$cliente) {
+            $cliente = $this->clienteModel
+                ->select('id, nome, cpf, telefone')
+                ->groupStart()
+                    ->where('cpf', $param)
+                    ->orLike('nome', $param)
+                ->groupEnd()
+                ->first();
+        }
+
+        if ($cliente) {
+            return $this->respond($cliente, ResponseInterface::HTTP_OK);
+        }
+
+        return $this->failNotFound('Cliente não encontrado');
     }
 
-    $cliente = $this->model->find($param);
-    if (!$cliente) {
-        $cliente = $this->model
-            ->select('nome, cpf, telefone')
-            ->groupStart()
-                ->where('cpf', $param)
-                ->orLike('nome', $param) 
-            ->groupEnd()
-            ->first();
-    }
-
-    if ($cliente) {
-        return $this->respond($cliente, 200);
-    }
-    return $this->failNotFound('Cliente não encontrado');
-        
-    }
     public function delete($id = null)
     {
-       $clienteEncontrado = $this->model->find($id);
-        if (!$clienteEncontrado) {
-            return $this->failNotFound('Cliente not found');
+        if (!$id) {
+            return $this->failValidationErrors(['message' => 'ID não informado.']);
         }
-        if ($this->model->delete($id)) {
-            return $this->respondDeleted(['message' => 'Cliente deleted successfully']);
+
+        $clienteEncontrado = $this->clienteModel->find($id);
+
+        if (!$clienteEncontrado) {
+            return $this->failNotFound('Cliente não encontrado');
+        }
+
+        if ($this->clienteModel->delete($id)) {
+            return $this->respondDeleted(['message' => 'Cliente deletado com sucesso']);
         } else {
-            return $this->failServerError('Failed to delete cliente');
+            return $this->failServerError('Falha ao deletar cliente');
         }
     }
-    
 }
