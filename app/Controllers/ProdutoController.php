@@ -105,19 +105,18 @@ class ProdutoController extends BaseController
             }
         }
         $this->produtoModel->setValidationRule('nome', "required|min_length[3]|is_unique[produtos.nome,id,{$id}]");
-
         if ($this->produtoModel->update($id, $data)) {
             return $this->response->setJSON([
                 'status' => 'sucesso',
                 'message' => 'Produto atualizado com sucesso!'
             ]);
-        } else {
+        }
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Erro ao atualizar produto.',
                 'errors' => $this->produtoModel->errors()
             ])->setStatusCode(400);
-        }
+        
     }
 
     public function delete($id = null)
@@ -143,12 +142,12 @@ class ProdutoController extends BaseController
                 'status' => 'sucesso',
                 'message' => 'Produto excluído com sucesso!'
             ]);
-        } else {
+        }
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Erro ao excluir produto.'
             ])->setStatusCode(500);
-        }
+        
     }
     public function filterByNome($nome = null)
 {
