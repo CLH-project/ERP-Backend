@@ -97,9 +97,9 @@ class FornecedorController extends ResourceController
         ]);
     }
 
-    public function filter($id = null)
+    public function filter($filtro = null)
     {
-        if ($id == null) {
+        if ($filtro == null) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Parâmetro de filtro não fornecido.'
@@ -110,7 +110,10 @@ class FornecedorController extends ResourceController
 
         $builder = $this->fornecedorModel
             ->select('fornecedores.id, fornecedores.nome, fornecedores.cnpj, contato_fornecedores.email, contato_fornecedores.telefone')
-            ->join('contato_fornecedores', 'contato_fornecedores.fornecedor_id = fornecedores.id');
+            ->join('contato_fornecedores', 'contato_fornecedores.fornecedor_id = fornecedores.id')->groupStart()
+            ->like('fornecedores.nome', $filtro)
+            ->orLike('fornecedores.cnpj', $filtro)
+            ->groupEnd();
 
         if ($nome) {
             $builder->like('fornecedores.nome', $nome);
@@ -121,6 +124,13 @@ class FornecedorController extends ResourceController
         }
 
         $fornecedores = $builder->findAll();
+
+        if(!$fornecedores){
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Nenhum fornecedor encontrado com os critérios fornecidos.'
+            ])->setStatusCode(404);
+        }
 
         return $this->response->setJSON([
             'status' => 'sucesso',
