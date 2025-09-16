@@ -97,8 +97,14 @@ class FornecedorController extends ResourceController
         ]);
     }
 
-    public function filter()
+    public function filter($id = null)
     {
+        if ($id == null) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Parâmetro de filtro não fornecido.'
+            ])->setStatusCode(400);
+        }
         $nome = $this->request->getGet('nome');
         $cnpj = $this->request->getGet('cnpj');
 

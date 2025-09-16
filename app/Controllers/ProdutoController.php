@@ -143,10 +143,10 @@ class ProdutoController extends BaseController
                 'message' => 'Produto excluído com sucesso!'
             ]);
         }
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Erro ao excluir produto.'
-            ])->setStatusCode(500);
+        return $this->response->setJSON([
+        'status' => 'error',
+        'message' => 'Erro ao excluir produto.'
+        ])->setStatusCode(500);
         
     }
     public function filterByNome($nome = null)
@@ -161,7 +161,7 @@ class ProdutoController extends BaseController
     }
 
     $produtos = $this->produtoModel
-        ->select('produtos.id, produtos.nome, produtos.valor_unico, fornecedores.nome as fornecedor')
+        ->select('produtos.id, produtos.nome, produtos.categoria, produtos.estoque,produtos.valor_unico, fornecedores.nome as fornecedor')
         ->join('fornecedores', 'fornecedores.id = produtos.fornecedor_id')
         ->like('produtos.nome', $nome)
         ->findAll();
