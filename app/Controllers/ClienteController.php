@@ -96,8 +96,8 @@ class ClienteController extends ResourceController
 
         if ($this->clienteModel->delete($id)) {
             return $this->respondDeleted(['message' => 'Cliente deletado com sucesso']);
-        } else {
-            return $this->failServerError('Falha ao deletar cliente');
         }
+        return $this->failServerError('Falha ao deletar cliente');
+        
     }
 }
