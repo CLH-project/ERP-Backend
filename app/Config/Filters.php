@@ -103,8 +103,8 @@ class Filters extends BaseFilters
      */
     public array $filters = [
         'auth' => [
-            'before' => ['*'],
-            'except' => ['login']
+            'before' => ['clientes','clientes/*','fornecedores','fornecedores/*','produtos','produtos/*','usuarios','usuarios/*'],
+            'except' => ['/login'],
         ],
 ];
 }
