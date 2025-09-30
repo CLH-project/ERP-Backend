@@ -9,7 +9,7 @@ class AuthFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         $session = session();
-        if( $session->get('usuario_logado')){
+        if(!$session->get('usuario_logado')){
             return \config\Services::response()
             ->setStatusCode(401)
             ->setJSON(['error'=> 'Acesso não autorizado.']);
