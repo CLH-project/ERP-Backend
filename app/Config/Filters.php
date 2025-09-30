@@ -33,6 +33,7 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        'auth'          => \App\Filters\AuthFilter::class,
     ];
 
     /**
@@ -69,18 +70,13 @@ class Filters extends BaseFilters
      *     after: array<string, array{except: list<string>|string}>|list<string>
      * }
      */
-    public array $globals = [
-        'before' => [
-            'cors', // Cross-Origin Resource Sharing
-            // 'honeypot',
-            // 'csrf',
-            // 'invalidchars',
-        ],
-        'after' => [
-            // 'honeypot',
-            // 'secureheaders',
-        ],
-    ];
+   public array $globals = [
+    'before' => [
+        'cors',
+        'auth',
+    ],
+    'after' => [],
+];
 
     /**
      * List of filter aliases that works on a
@@ -106,5 +102,11 @@ class Filters extends BaseFilters
      *
      * @var array<string, array<string, list<string>>>
      */
-    public array $filters = [];
+    public array $filters = [
+    'auth' => [
+        'before' => [
+            'all' => ['except' => ['login']],
+        ],
+    ],
+];
 }

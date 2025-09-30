@@ -15,6 +15,10 @@ class CreateUsuario extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
+            'login' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 50,
+            ],
             'nome' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 100,
