@@ -10,7 +10,7 @@ class UsuarioModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nome','cpf','senha','cargo'];
+    protected $allowedFields    = ['login','nome','cpf','senha','cargo'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -28,6 +28,7 @@ class UsuarioModel extends Model
     // Validation
     protected $validationRules      = [
         'nome'  => 'required|min_length[3]|max_length[100]',
+        'login' => 'required|min_length[3]|max_length[50]|is_unique[usuarios.login,id,{id}]',
         'cpf'   => 'required|valid_cpf|is_unique[usuarios.cpf,id,{id}]',
         'senha' => 'required|min_length[6]',
         'cargo' => 'required|in_list[gerente,caixa]'

@@ -39,3 +39,5 @@ $routes->get('usuarios','UsuarioController::paginate');
 $routes->post('usuarios','UsuarioController::create');
 $routes->put('usuarios/(:num)','UsuarioController::update/$1');
 $routes->delete('usuarios/(:num)','UsuarioController::delete/$1');
+
+$routes->post('login','AuthController::login');
