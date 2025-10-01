@@ -5,42 +5,47 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\UsuarioModel;
 use CodeIgniter\HTTP\ResponseInterface;
+use Firebase\JWT\JWT;
 
 class AuthController extends BaseController
 {
     public function login()
     {
-         $data = $this->request->getJSON(true);
-
-        if (!$data || empty($data['login']) || empty($data['senha'])) {
-            return $this->response->setJSON([
-                'status' => 'erro',
-                'mensagem' => 'login e senha são obrigatórios.'
-            ])->setStatusCode(400);
-        }
         $usuarioModel = new UsuarioModel();
-        $usuario = $usuarioModel->where('login', $data['login'])->first();
-        if( !$usuario || !password_verify($data['senha'], $usuario['senha'])) {
-            return $this->response->setJSON([
-                'status' => 'erro',
-                'mensagem' => 'Credenciais inválidas.'
-            ])->setStatusCode(401);
+
+        $input = $this->request->getJSON(true);
+        $login = $input['login'] ?? null;
+        $senha = $input['senha'] ?? null;
+
+        if (!$login || !$senha) {
+            return $this->response->setStatusCode(400)
+                ->setJSON(['error' => 'Login e senha são obrigatórios.']);
         }
-        $session = session();
-        $session->set([
-            'usuario_id'     => $usuario['id'],
-            'usuario_nome'   => $usuario['nome'],
-            'usuario_cargo'  => $usuario['cargo'],
-            'usuario_logado' => true
-        ]);
+
+        $usuario = $usuarioModel->where('login', $login)->first();
+
+        if (!$usuario || !password_verify($senha, $usuario['senha'])) {
+            return $this->response->setStatusCode(401)
+                ->setJSON(['error' => 'Credenciais inválidas.']);
+        }
+
+        $key = getenv('JWT_SECRET') ?: 'sua_chave_secreta_aqui';
+        $payload = [
+            'sub' => $usuario['id'],
+            'login' => $usuario['login'],
+            'iat' => time(),
+            'exp' => time() + 3600 // 1 hora de validade
+        ];
+
+        $token = JWT::encode($payload, $key, 'HS256');
+
         return $this->response->setJSON([
-            'status' => 'sucesso',
-            'mensagem' => 'Login realizado com sucesso.',
+            'token' => $token,
             'usuario' => [
-                'id'    => $usuario['id'],
-                'nome'  => $usuario['nome'],
-                'cargo' => $usuario['cargo']
+                'id' => $usuario['id'],
+                'login' => $usuario['login'],
+                'nome' => $usuario['nome'] ?? null
             ]
-        ])->setStatusCode(200);
+        ]);
     }
 }
