@@ -12,8 +12,9 @@ $routes->get('/', 'Home::index');
 $routes->options('(:any)', static function () {
     return response()->setStatusCode(204);
 });
+$routes->post('login','AuthController::login');
 
-// Controller de Clientes
+$routes->group('',['filter'=>'auth'],function($routes){
 $routes->get('/clientes', 'ClienteController::paginados',); // URL http://localhost:8000/clientes
 $routes->post('/clientes', 'ClienteController::create'); // URL http://localhost:8000/clientes
 $routes->get('/clientes/(:num)', 'ClienteController::show/$1'); // URL http://localhost:8000/clientes/1
@@ -39,5 +40,5 @@ $routes->get('usuarios','UsuarioController::paginate');
 $routes->post('usuarios','UsuarioController::create');
 $routes->put('usuarios/(:num)','UsuarioController::update/$1');
 $routes->delete('usuarios/(:num)','UsuarioController::delete/$1');
+});
 
-$routes->post('login','AuthController::login');
