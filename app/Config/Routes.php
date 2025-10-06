@@ -7,11 +7,6 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-
-// Rotas para options
-$routes->options('(:any)', static function () {
-    return response()->setStatusCode(204);
-});
 $routes->post('login','AuthController::login');
 
 $routes->group('',['filter'=>'auth'],function($routes){
