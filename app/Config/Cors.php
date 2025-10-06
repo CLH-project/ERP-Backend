@@ -26,7 +26,7 @@ class Cors extends BaseConfig
      */
     public array $default = [
         
-        'allowedOrigins' => [],
+        'allowedOrigins' => ['http://localhost:3000'],
 
         /**
          * Origin regex patterns for the `Access-Control-Allow-Origin` header.
@@ -60,7 +60,7 @@ class Cors extends BaseConfig
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
          */
-        'allowedHeaders' => ['*'],
+        'allowedHeaders' => ['Content-Type', 'Authorization'],
 
         /**
          * Set headers to expose.
@@ -92,6 +92,6 @@ class Cors extends BaseConfig
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
          */
-        'maxAge' => 7200,
+        'maxAge' => 7200, 
     ];
 }
