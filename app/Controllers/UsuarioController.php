@@ -72,7 +72,7 @@ class UsuarioController extends BaseController
 
         if (! $this->usuarioModel->update($id, $data)) {
             return $this->response->setJSON([
-                'status' => 'error',
+                'status' => 'erro',
                 'message' => 'Erro ao atualizar usuário.',
                 'errors' => $this->usuarioModel->errors()
             ])->setStatusCode(400);
@@ -118,7 +118,7 @@ class UsuarioController extends BaseController
         if ($id === null) {
             return $this->response->setJSON([
                 'status' => 'erro',
-                'mensage' => 'ID do usuário não fornecido.'
+                'mensagem' => 'ID do usuário não fornecido.'
             ])->setStatusCode(400);
         }
 
@@ -133,13 +133,13 @@ class UsuarioController extends BaseController
         if (! $this->usuarioModel->delete($id)) {
             return $this->response->setJSON([
                 'status' => 'erro',
-                'mensage' => 'Erro ao deletar o usuário.'
+                'mensagem' => 'Erro ao deletar o usuário.'
             ])->setStatusCode(500);
         }
 
         return $this->response->setJSON([
             'status' => 'sucesso',
-            'mensage' => 'Usuário deletado com sucesso.'
+            'mensagem' => 'Usuário deletado com sucesso.'
         ]);
     }
 }
