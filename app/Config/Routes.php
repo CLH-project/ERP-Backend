@@ -29,11 +29,14 @@ $routes->get('produtos','ProdutoController::paginate');
 $routes->put('produtos/(:num)','ProdutoController::update/$1');
 $routes->delete('produtos/(:num)','ProdutoController::delete/$1');
 $routes->get('produtos/filter','ProdutoController::filterByNome');
+});
 
+$routes->group('',['filter'=>'gerente'],function($routes){
 // Rotas Usuarios
 $routes->get('usuarios','UsuarioController::paginate');
 $routes->post('usuarios','UsuarioController::create');
 $routes->put('usuarios/(:num)','UsuarioController::update/$1');
 $routes->delete('usuarios/(:num)','UsuarioController::delete/$1');
 });
+
 
