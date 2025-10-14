@@ -27,10 +27,12 @@ class AuthController extends BaseController
                 ->setJSON(['error' => 'Credenciais inválidas.']);
         }
 
+        // 🔑 Inclui o cargo do usuário no token
         $key = getenv('JWT_SECRET') ?: 'sua_chave_secreta_aqui';
         $payload = [
             'sub' => $usuario['id'],
             'login' => $usuario['login'],
+            'cargo' => $usuario['cargo'], // << aqui entra o campo cargo
             'iat' => time(),
             'exp' => time() + 3600 // 1 hora de validade
         ];
@@ -42,8 +44,10 @@ class AuthController extends BaseController
             'usuario' => [
                 'id' => $usuario['id'],
                 'login' => $usuario['login'],
-                'nome' => $usuario['nome'] ?? null
+                'nome' => $usuario['nome'] ?? null,
+                'cargo' => $usuario['cargo'] ?? null
             ]
         ]);
     }
 }
+
