@@ -21,7 +21,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('/clientes/(:num)', 'ClienteController::show/$1'); // URL http://localhost:8000/clientes/1
     $routes->delete('/clientes/(:num)', 'ClienteController::delete/$1'); // URL http://localhost:8000/clientes/1
     $routes->get('/clientes/(:any)', 'ClienteController::show/$1'); // URL http://localhost:8000/clientes/12345678901 (CPF) ou http://localhost/clientes/JoÃ£o (Nome)
-+
 
     // Rotas Produtos
     $routes->post('produtos', 'ProdutoController::create');
@@ -30,23 +29,19 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->delete('produtos/(:num)', 'ProdutoController::delete/$1');
     $routes->get('produtos/filter', 'ProdutoController::filterByNome');
 
+    // Rotas Vendas
+     $routes->post('vendas', 'VendaController::cadastrar');
+
     $routes->options('produtos', static function () {
         return response()
             ->setStatusCode(204)
             ->setHeader('Allow', 'OPTIONS, POST');
     });
-
-    $routes->options('fornecedores', static function () {
-        return response()
-            ->setStatusCode(204)
-            ->setHeader('Allow', 'OPTIONS, POST');
-    });
-
-    $routes->options('usuarios', static function () {
-        return response()
-            ->setStatusCode(204)
-            ->setHeader('Allow', 'OPTIONS, POST');
-    });
+       $routes->options('vendas', static function () {
+         return response()
+             ->setStatusCode(204)
+             ->setHeader('Allow', 'OPTIONS, POST');
+     });
 });
 
 $routes->group('', ['filter' => 'gerente'], function ($routes) {
@@ -67,7 +62,7 @@ $routes->group('', ['filter' => 'gerente'], function ($routes) {
             ->setStatusCode(204)
             ->setHeader('Allow', 'OPTIONS, POST');
     });
-    
+
     $routes->options('fornecedores', static function () {
         return response()
             ->setStatusCode(204)
