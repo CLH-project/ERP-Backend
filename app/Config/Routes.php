@@ -37,6 +37,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
             ->setStatusCode(204)
             ->setHeader('Allow', 'OPTIONS, POST');
     });
+    $routes->options('clientes', static function () {
+        return response()
+            ->setStatusCode(204)
+            ->setHeader('Allow', 'OPTIONS, GET, POST, DELETE');
+    });
        $routes->options('vendas', static function () {
          return response()
              ->setStatusCode(204)
