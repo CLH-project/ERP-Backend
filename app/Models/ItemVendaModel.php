@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class ItemVendaModel extends Model
 {
-    protected $table            = 'itemvenda';
+    protected $table            = 'itemVenda';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

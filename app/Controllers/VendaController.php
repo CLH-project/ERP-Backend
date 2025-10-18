@@ -27,15 +27,26 @@ class VendaController extends BaseController
     {
         $data = $this->request->getJSON(true);
 
-        if (!$data) {
+        // Normaliza $data para array caso venha como stdClass (evita "stdClass as array")
+        if (is_object($data)) {
+            $data = json_decode(json_encode($data), true);
+        }
+
+        if (!$data || !is_array($data)) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Dados não enviados ou inválidos.'
             ])->setStatusCode(400);
         }
 
-        // Verifica se o cliente existe
-        $cliente = $this->clienteModel->find($data['cliente_id']);
+        // Verifica se o cliente existe (usa coalescing para evitar notice)
+        $clienteId = $data['cliente_id'] ?? null;
+        $cliente = $this->clienteModel->find($clienteId);
+        // defesa: normaliza resultado do model caso seja stdClass (apesar do returnType)
+        if (is_object($cliente)) {
+            $cliente = json_decode(json_encode($cliente), true);
+        }
+
         if (!$cliente) {
             return $this->response->setJSON([
                 'status' => 'error',
@@ -43,25 +54,54 @@ class VendaController extends BaseController
             ])->setStatusCode(404);
         }
 
-        // Captura ID do usuário logado (session, auth() ou atributo da request)
+        // Captura ID do usuário logado (tenta várias fontes)
         $usuarioId = null;
 
+        // 1) Session (se estiver usando sessão)
         if (function_exists('session') && session()->has('usuario_id')) {
             $usuarioId = session()->get('usuario_id');
         }
         if (empty($usuarioId) && function_exists('session') && session()->has('id')) {
             $usuarioId = session()->get('id');
         }
+
+        // 2) helper auth() (se existir)
         if (empty($usuarioId) && function_exists('auth')) {
             $authUser = auth()->user();
             if (!empty($authUser)) {
-                $usuarioId = $authUser->id ?? $authUser['id'] ?? null;
+                if (is_array($authUser)) {
+                    $usuarioId = $authUser['id'] ?? $authUser['usuario_id'] ?? null;
+                } elseif (is_object($authUser)) {
+                    $usuarioId = $authUser->id ?? $authUser->usuario_id ?? null;
+                }
             }
         }
-        if (empty($usuarioId)) {
-            $reqUser = $this->request->getAttribute('user') ?? $this->request->getAttribute('usuario');
+
+        // 3) Request attribute (alguns filtros PSR usam getAttribute)
+        if (empty($usuarioId) && is_callable([$this->request, 'getAttribute'])) {
+            $reqUser = $this->request->getAttribute('user') ?? $this->request->getAttribute('usuario') ?? null;
             if (!empty($reqUser)) {
-                $usuarioId = $reqUser->id ?? $reqUser['id'] ?? null;
+                if (is_array($reqUser)) {
+                    $usuarioId = $reqUser['id'] ?? $reqUser['usuario_id'] ?? null;
+                } elseif (is_object($reqUser)) {
+                    $usuarioId = $reqUser->id ?? $reqUser->usuario_id ?? null;
+                }
+            }
+        }
+
+        // 4) Fallback: tenta extrair id direto do Authorization: Bearer <token>
+        if (empty($usuarioId)) {
+            $authHeader = $this->request->getHeaderLine('Authorization') ?: $this->request->getServer('HTTP_AUTHORIZATION');
+            if (!empty($authHeader) && stripos($authHeader, 'Bearer ') === 0) {
+                $token = trim(substr($authHeader, 7));
+                // tenta decodificar payload JWT (ATENÇÃO: sem verificar assinatura)
+                $parts = explode('.', $token);
+                if (count($parts) >= 2) {
+                    $payload = json_decode(self::base64url_decode($parts[1]), true);
+                    if (is_array($payload)) {
+                        $usuarioId = $payload['id'] ?? $payload['usuario_id'] ?? $payload['sub'] ?? null;
+                    }
+                }
             }
         }
 
@@ -101,13 +141,21 @@ class VendaController extends BaseController
                 throw new \Exception('Itens da venda não informados.');
             }
 
-            foreach ($data['itens'] as $item) {
+            foreach ($data['itens'] as $rawItem) {
+                // garante que cada item seja um array
+                $item = is_object($rawItem) ? json_decode(json_encode($rawItem), true) : (array) $rawItem;
+
                 // Valida campos mínimos do item
                 if (empty($item['produto_id']) || empty($item['quantidade'])) {
                     throw new \Exception('Item inválido: produto_id e quantidade são obrigatórios.');
                 }
 
                 $produto = $this->produtoModel->find($item['produto_id']);
+                // defesa extra: normaliza produto caso venha como stdClass
+                if (is_object($produto)) {
+                    $produto = json_decode(json_encode($produto), true);
+                }
+
                 if (!$produto) {
                     throw new \Exception("Produto com ID {$item['produto_id']} não encontrado.", 404);
                 }
@@ -173,5 +221,17 @@ class VendaController extends BaseController
                 'message' => $e->getMessage()
             ])->setStatusCode($statusCode);
         }
+    }
+
+    // adicionar método utilitário na classe (abaixo do método cadastrar ou na classe):
+    private static function base64url_decode(string $data): string
+    {
+        $remainder = strlen($data) % 4;
+        if ($remainder) {
+            $padlen = 4 - $remainder;
+            $data .= str_repeat('=', $padlen);
+        }
+        $data = strtr($data, '-_', '+/');
+        return base64_decode($data);
     }
 }
