@@ -223,6 +223,52 @@ class VendaController extends BaseController
         }
     }
 
+    public function paginate()
+    {
+        $perPage = (int) ($this->request->getVar('per_page') ?? 10);
+        // o método paginate do Model usa a query param "page" automaticamente,
+        // então não precisamos setar $page manualmente aqui
+        $this->vendaModel->select(
+            'vendas.id AS venda_id,' .
+            'vendas.usuario_id, usuarios.nome AS usuario_nome,' .
+            'vendas.cliente_id, clientes.nome AS cliente_nome,' .
+            'vendas.total_venda, vendas.created_at, vendas.updated_at'
+        )
+        ->join('usuarios', 'usuarios.id = vendas.usuario_id', 'left')
+        ->join('clientes', 'clientes.id = vendas.cliente_id', 'left')
+        ->orderBy('vendas.created_at', 'DESC');
+
+        $rows = $this->vendaModel->paginate($perPage);
+        $pager = $this->vendaModel->pager;
+
+        // Normaliza possíveis objetos para array (segurança)
+        $items = array_map(function ($r) {
+            return is_object($r) ? json_decode(json_encode($r), true) : $r;
+        }, $rows);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => array_map(function ($row) {
+                return [
+                    'venda_id'     => $row['venda_id'] ?? null,
+                    'usuario_id'   => $row['usuario_id'] ?? null,
+                    'usuario_nome' => $row['usuario_nome'] ?? null,
+                    'cliente_id'   => $row['cliente_id'] ?? null,
+                    'cliente_nome' => $row['cliente_nome'] ?? null,
+                    'total_venda'  => $row['total_venda'] ?? 0,
+                    'created_at'   => $row['created_at'] ?? null,
+                    'updated_at'   => $row['updated_at'] ?? null,
+                ];
+            }, $items),
+            'pagination' => [
+                'currentPage' => $pager ? $pager->getCurrentPage() : 1,
+                'perPage'     => $pager ? $pager->getPerPage() : $perPage,
+                'total'       => $pager ? $pager->getTotal() : count($items),
+                'pageCount'   => $pager ? $pager->getPageCount() : 1,
+            ],
+        ])->setStatusCode(200);
+    }
+
     // adicionar método utilitário na classe (abaixo do método cadastrar ou na classe):
     private static function base64url_decode(string $data): string
     {
