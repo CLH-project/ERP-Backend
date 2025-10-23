@@ -30,6 +30,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     // Rotas Vendas
      $routes->post('vendas', 'VendaController::cadastrar');
+     $routes->get('vendas', 'VendaController::paginate');
 
     $routes->options('produtos', static function () {
         return response()
