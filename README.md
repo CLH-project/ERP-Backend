@@ -1,4 +1,4 @@
-# ERP-Backend
+# ERP-Backend (CLH)
 
 ERP-Backend é uma aplicação desenvolvida em **PHP (CodeIgniter)** para gerenciamento empresarial.  
 O sistema possui módulos de cadastro e controle de usuários, produtos, fornecedores, clientes e vendas.
