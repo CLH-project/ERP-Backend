@@ -31,4 +31,4 @@ O sistema possui módulos de cadastro e controle de usuários, produtos, fornece
 
 ## Equipe
 - Back-end - Carlos Henrique
-- Front=end - Luiz Henrique
+- Front-end - Luiz Henrique
